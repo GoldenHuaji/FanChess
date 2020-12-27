@@ -38,17 +38,21 @@ class Window : JFrame() {
                     return@addActionListener
                 }
                 mgr.put(ConfigManager.ENABLED_PACK_PATH, file.absolutePath)
+                Window()
+                dispose()
             }
         })
         panel.add(JButton("改为默认").apply {
             addActionListener {
                 mgr.remove(ConfigManager.ENABLED_PACK_PATH)
+                Window()
+                dispose()
             }
         })
         panel.add(JButton("如何制作？").apply {
             addActionListener {
                 JOptionPane.showMessageDialog(null,
-                """文件格式如下，并且打成 Zip 压缩包:
+                """文件目录如下，并且打成 Zip 压缩包:
                     | 黑车.png
                     | 黑将.png
                     | 黑马.png
@@ -64,6 +68,7 @@ class Window : JFrame() {
                     | 红相.png
                     | 红兵.png
                     | 军师.png
+                    | 空棋.png
                     | 棋盘.png
                 """.trimMargin())
             }

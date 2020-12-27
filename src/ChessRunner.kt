@@ -8,6 +8,7 @@ import goldenhuaji.me.fanchess.Utils.getChessMapFileContent
 import goldenhuaji.me.fanchess.Utils.getChessMapInfo
 import goldenhuaji.me.fanchess.Utils.jsonToChessMap
 import goldenhuaji.me.fanchess.pack.ResLoader
+import goldenhuaji.me.fanchess.settings.ConfigManager
 import java.awt.Color
 import java.awt.Image
 import java.awt.Graphics
@@ -328,6 +329,9 @@ class ChessRunner(
     }
 
     fun refresh() {
+        chessMap.forEach {
+            it!!.shit = ConfigManager.get().getBooleanNonNull(ConfigManager.SHIT_MODE)
+        }
         this.validate()
         this.repaint()
     }
