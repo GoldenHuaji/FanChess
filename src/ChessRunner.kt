@@ -313,7 +313,7 @@ class ChessRunner(
     fun undo() {
         try {
             val tmp = jsonToChessMap(chessMapUndoTree[chessMapUndoTree.lastIndex]["chessMap"]!! as Array<String>)
-            chessMap = tmp
+            chessMap = tmp.clone()
             turn = chessMapUndoTree[chessMapUndoTree.lastIndex]["turn"]!! as Int
             chessMapUndoTree.removeAt(chessMapUndoTree.lastIndex)
         } catch (e: IndexOutOfBoundsException) {
@@ -321,9 +321,9 @@ class ChessRunner(
 //            chessMap = chessMapBackup.clone()
             return
         }
-        chessMap.forEachIndexed { index, _ ->
-            chessMap[index] = null
-        }
+//        chessMap.forEachIndexed { index, _ ->
+//            chessMap[index] = null
+//        }
         doInit()
         refresh()
     }

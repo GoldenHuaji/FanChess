@@ -75,7 +75,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
         val btnShowAllChessItem = JButton("翻开所有棋子")
         btnShowAllChessItem.addActionListener {
             try {
-//                chessPan.addToBackTree()
+                chessPan.addToBackTree()
                 chessPan.chessMap.forEach {
                     it!!.shown = true
                 }
