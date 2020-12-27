@@ -6,6 +6,7 @@ import goldenhuaji.me.fanchess.ChessItem
 import goldenhuaji.me.fanchess.GLog
 import goldenhuaji.me.fanchess.GLog.logd
 import goldenhuaji.me.fanchess.Utils
+import goldenhuaji.me.fanchess.pack.ResLoader
 import java.awt.*
 import java.io.File
 import java.io.FileNotFoundException
@@ -19,7 +20,7 @@ class ChessRunner(
     var turn: Int? = 1
 
     init {
-        bg = ImageIcon(javaClass.classLoader.getResource("棋盘.png")).image
+        bg = ImageIcon(ResLoader.loadRes("棋盘.png")).image
         doInit()
     }
 

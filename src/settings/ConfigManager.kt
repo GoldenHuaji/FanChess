@@ -30,6 +30,10 @@ class ConfigManager {
         tmp[key] = value
     }
 
+    fun remove(key: String) {
+        tmp.remove(key)
+    }
+
     fun changeBoolean(key: String) {
         tmp[key] = !getBooleanNonNull(key)
     }
@@ -62,9 +66,10 @@ class ConfigManager {
     }
 
     companion object {
-        var SELF: ConfigManager? = null
+        private var SELF: ConfigManager? = null
         fun get(): ConfigManager = SELF ?: ConfigManager().apply { SELF = this }
 
         val SHIT_MODE = "ShitMode".hashCode().toString()
+        val ENABLED_PACK_PATH = "EnabledPackPath".hashCode().toString()
     }
 }

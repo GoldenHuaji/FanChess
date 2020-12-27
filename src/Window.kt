@@ -6,8 +6,10 @@ import goldenhuaji.me.fanchess.GLog.logd
 import goldenhuaji.me.fanchess.GLog.loge
 import goldenhuaji.me.fanchess.Utils.getChessMapFileContent
 import goldenhuaji.me.fanchess.Utils.getChessMapInfo
+import goldenhuaji.me.fanchess.Utils.jsonToChessMap
 import goldenhuaji.me.fanchess.diyChessMap.Window
 import goldenhuaji.me.fanchess.settings.ConfigManager
+import goldenhuaji.me.fanchess.ui.MyVFlowLayout
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -16,9 +18,11 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileWriter
 import javax.swing.*
+import kotlin.system.exitProcess
 
 
-class Window(chessMap: Array<ChessItem?>) {
+@SuppressWarnings("unchecked")
+class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
     var frmIpa: JFrame? = null
 
     init {
@@ -71,7 +75,7 @@ class Window(chessMap: Array<ChessItem?>) {
         val btnShowAllChessItem = JButton("翻开所有棋子")
         btnShowAllChessItem.addActionListener {
             try {
-                chessPan.addToBackTree()
+//                chessPan.addToBackTree()
                 chessPan.chessMap.forEach {
                     it!!.shown = true
                 }
@@ -82,11 +86,15 @@ class Window(chessMap: Array<ChessItem?>) {
 
         panel.add(btnNewWar)
         panel.add(btnShowAllChessItem)
-        panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
+        panel.layout = MyVFlowLayout()
         val jPanel = JPanel()
-        chessPan.addToBackTree()
+        if (turn != null) {
+            if (chessPan.getTurn() != turn) {
+                chessPan.changeTurn()
+            }
+        }
         jPanel.add(chessPan)
-        val btnUndo = JButton("悔棋　　　　")
+        val btnUndo = JButton("悔棋")
         btnUndo.addActionListener {
             try {
                 chessPan.undo()
@@ -95,7 +103,7 @@ class Window(chessMap: Array<ChessItem?>) {
             }
         }
         jPanel.add(chessPan)
-        val btnSave = JButton("保存对战　　")
+        val btnSave = JButton("保存对战")
         btnSave.addActionListener {
             try {
                 chessPan.save(frmIpa!!)
@@ -103,7 +111,7 @@ class Window(chessMap: Array<ChessItem?>) {
                 loge(t)
             }
         }
-        val btnLoad = JButton("加载对战　　")
+        val btnLoad = JButton("加载对战")
         btnLoad.addActionListener {
             try {
                 val jfc = JFileChooser()
@@ -124,7 +132,7 @@ class Window(chessMap: Array<ChessItem?>) {
                 loge(t)
             }
         }
-        val btnEdit = JButton("自定义布局　")
+        val btnEdit = JButton("自定义布局")
         btnEdit.addActionListener {
             try {
                 Window()
@@ -132,10 +140,18 @@ class Window(chessMap: Array<ChessItem?>) {
                 loge(t)
             }
         }
-        val btnSettings = JButton("设置　　　　")
+        val btnSettings = JButton("设置")
         btnSettings.addActionListener {
             try {
                 goldenhuaji.me.fanchess.settings.Window()
+            } catch (t: Throwable) {
+                loge(t)
+            }
+        }
+        val btnRefresh = JButton("刷新")
+        btnRefresh.addActionListener {
+            try {
+                chessPan.refresh()
             } catch (t: Throwable) {
                 loge(t)
             }
@@ -144,6 +160,7 @@ class Window(chessMap: Array<ChessItem?>) {
         panel.add(btnSave)
         panel.add(btnLoad)
         panel.add(btnEdit)
+        panel.add(btnRefresh)
         panel.add(btnSettings)
         panel.add(tv)
         panel.add(tv2)
@@ -174,32 +191,37 @@ class Window(chessMap: Array<ChessItem?>) {
             }
 
             override fun windowClosing(e: WindowEvent?) {
-                logd("窗口关闭")
-                // 保存设置
-                ConfigManager.get().save()
-                val array = Array(32) {
-                    chessPan.chessMap[it]!!.shown
-                }
-                // 如果全部都没有翻开
-                if (array.contentEquals(Array(32) { false })) {
-                    return
-                }
-                val file = File("${System.getenv("APPDATA")}\\FanChess\\backup.json")
-                logd(file.absolutePath)
-                if (!file.exists()) {
-                    val dir: File
-                    if (!(File("${System.getenv("APPDATA")}\\FanChess")).apply {
-                            logd(this.absolutePath)
-                            dir = this
-                        }.exists()) {
-                        dir.mkdir()
+                try {
+                    logd("窗口关闭")
+                    // 保存设置
+                    ConfigManager.get().save()
+                    val array = Array(32) {
+                        chessPan.chessMap[it]!!.shown
                     }
-                    file.createNewFile()
+                    // 如果全部都没有翻开
+                    if (array.contentEquals(Array(32) { false })) {
+                        return
+                    }
+                    val file = File("${System.getenv("APPDATA")}\\FanChess\\backup.json")
+                    logd(file.absolutePath)
+                    if (!file.exists()) {
+                        val dir: File
+                        if (!(File("${System.getenv("APPDATA")}\\FanChess")).apply {
+                                logd(this.absolutePath)
+                                dir = this
+                            }.exists()) {
+                            dir.mkdir()
+                        }
+                        file.createNewFile()
+                    }
+                    val fileWriter = FileWriter(file)
+                    fileWriter.write(getChessMapFileContent(chessPan.chessMap, chessPan.getTurn()!!))
+                    fileWriter.flush()
+                    fileWriter.close()
+                } catch (t: Throwable) {
+                    loge(t)
+                    exitProcess(-1)
                 }
-                val fileWriter = FileWriter(file)
-                fileWriter.write(getChessMapFileContent(chessPan.chessMap, chessPan.getTurn()!!))
-                fileWriter.flush()
-                fileWriter.close()
             }
         })
     }

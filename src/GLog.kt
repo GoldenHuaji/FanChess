@@ -19,7 +19,7 @@ object GLog {
         println("FanFanChess Log/Info: $msg")
     }
 
-    fun loge(t: Throwable) {
+    fun loge(t: Throwable, msg: String = "") {
         println("FanFanChess Log/Error: ${getStackTraceString(t)}")
         JOptionPane.showOptionDialog(
             null,
@@ -34,6 +34,18 @@ object GLog {
             arrayOf("确定"),
             "确定"
         )
+        if (msg.isNotEmpty()) {
+            JOptionPane.showOptionDialog(
+                null,
+                msg,
+                "错误",
+                JOptionPane.OK_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                null,
+                arrayOf("确定"),
+                "确定"
+            )
+        }
     }
 
     fun getStackTraceString(tr: Throwable?): String? {

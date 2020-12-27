@@ -3,6 +3,7 @@ package goldenhuaji.me.fanchess.diyChessMap
 import goldenhuaji.me.fanchess.ChessItem
 import goldenhuaji.me.fanchess.GLog
 import goldenhuaji.me.fanchess.Utils
+import goldenhuaji.me.fanchess.ui.MyVFlowLayout
 import java.awt.BorderLayout
 import java.awt.event.WindowEvent
 import java.io.File
@@ -24,8 +25,8 @@ class Window {
         val chessPan = ChessRunner(Array(32) {
             ChessItem()
         })
-        val leftPanel = JPanel().apply {
-            add(JButton("保存　　　　").also {
+        val leftPanel = JPanel(MyVFlowLayout()).apply {
+            add(JButton("保存").also {
                 it.addActionListener {
                     if (fileToSaveAt == null) {
                         val file = chessPan.save(frmIpa!!) ?: return@addActionListener
@@ -35,7 +36,7 @@ class Window {
                     }
                 }
             })
-            add(JButton("另存为　　　").also {
+            add(JButton("另存为").also {
                 it.addActionListener {
                     val file = chessPan.save(frmIpa!!) ?: return@addActionListener
                     fileToSaveAt = file
@@ -48,7 +49,7 @@ class Window {
                 }
             }
 
-            add(JButton("从文件加载　").also {
+            add(JButton("从文件加载").also {
                 it.addActionListener {
                     try {
                         val jfc = JFileChooser()
