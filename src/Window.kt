@@ -1,24 +1,18 @@
 package goldenhuaji.me.fanchess
 
-import com.alibaba.fastjson.JSON
-import com.alibaba.fastjson.JSONArray
 import goldenhuaji.me.fanchess.GLog.logd
 import goldenhuaji.me.fanchess.GLog.loge
 import goldenhuaji.me.fanchess.Utils.getChessMapFileContent
-import goldenhuaji.me.fanchess.Utils.getChessMapInfo
-import goldenhuaji.me.fanchess.Utils.jsonToChessMap
 import goldenhuaji.me.fanchess.diyChessMap.Window
 import goldenhuaji.me.fanchess.settings.ConfigManager
 import goldenhuaji.me.fanchess.ui.MyVFlowLayout
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.awt.event.WindowListener
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileWriter
 import javax.swing.*
-import javax.swing.UIManager.LookAndFeelInfo
 import kotlin.system.exitProcess
 
 
@@ -82,7 +76,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
         val tv = JLabel("现在应该红方行走")
         val tv2 = JLabel("")
 
-        val chessPan = ChessRunner(frmIpa!!, chessMap, tv2, tv)
+        val chessPan = ChessRunner(chessMap, tv2, tv)
         val btnShowAllChessItem = JButton("翻开所有棋子")
         btnShowAllChessItem.isFocusPainted = false
         btnShowAllChessItem.addActionListener {

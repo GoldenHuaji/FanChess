@@ -21,14 +21,16 @@ import kotlin.collections.HashMap
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileWriter
+import java.lang.NullPointerException
 import javax.swing.JFileChooser
+import javax.swing.border.Border
 
 class ChessRunner(
-    private val frame: JFrame,
     var chessMap: Array<ChessItem?>,
     private val tv: JLabel,
     private val tvShowTurn: JLabel,
 ) : JPanel(GridLayout(4, 8)) {
+
     private var bg: Image? = null
     private var checkedChessItemIndex: Int? = null
     private var turn: Int? = ChessItem.CHESS_COLOR_RED
@@ -43,13 +45,17 @@ class ChessRunner(
     private val chessMapUndoTree: MutableList<HashMap<String, Any>> = mutableListOf()
     private var chessMapBackup: Array<ChessItem?> = chessMap.clone()
 
-    fun getTurn(): Int? {
-        return turn
-    }
+    private val noBorder: Border = BorderFactory.createLineBorder(Color(0f, 0f, 0f, 0f), 5)
+    private val redBorder: Border = BorderFactory.createLineBorder(Color.RED, 5)
+    private val blueBorder: Border = BorderFactory.createLineBorder(Color.BLUE, 5)
 
     init {
         bg = ImageIcon(ResLoader.loadRes("棋盘.png")).image
         doInit()
+    }
+
+    fun getTurn(): Int? {
+        return turn
     }
 
     override fun paintComponent(g: Graphics) {
@@ -65,7 +71,8 @@ class ChessRunner(
             val action = addActionListener@{ _: ActionEvent ->
                 try {
                     if (chessMap.first() == null) {
-                        logd("Warning: ChessItem is null.")
+                        loge(NullPointerException("I don't know what happened.But something's wrong."),
+                            "你是怎么做到把游戏搞崩溃的？务必把你是怎么做到的告诉开发者。")
                     }
                     // 黑方红方交替走棋
                     if (ele.shown && ele.chessColor != turn && checkedChessItemIndex == null) {
@@ -78,14 +85,15 @@ class ChessRunner(
                             // 如果选中了棋子
                             if (checkedChessItemIndex != null) {
                                 checkedChessItemIndex = null
-                                chessMap.forEach {
-                                    it!!.border = BorderFactory.createLineBorder(Color(0f, 0f, 0f, 0f), 5)
+                                chessMap.forEachIndexed { i, _ ->
+                                    i.changeBorder(ChessItem.BORDER_TYPE_NONE)
                                 }
                                 return@addActionListener
                             }
                             checkedChessItemIndex = null
                             addToBackTree()
                             ele.shown = true
+                            i.changeBorder(ChessItem.BORDER_TYPE_EAT)
                             changeTurn()
                             return@addActionListener
                         }
@@ -93,14 +101,15 @@ class ChessRunner(
                             // 如果选中了棋子
                             if (checkedChessItemIndex != null) {
                                 checkedChessItemIndex = null
-                                chessMap.forEach {
-                                    it!!.border = BorderFactory.createLineBorder(Color(0f, 0f, 0f, 0f), 5)
+                                chessMap.forEachIndexed { i, _ ->
+                                    i.changeBorder(ChessItem.BORDER_TYPE_NONE)
                                 }
                                 return@addActionListener
                             }
                             checkedChessItemIndex = null
                             addToBackTree()
                             ele.shown = true
+                            i.changeBorder(ChessItem.BORDER_TYPE_EAT)
                             changeTurn()
                             return@addActionListener
                         }
@@ -112,14 +121,14 @@ class ChessRunner(
                             return@addActionListener
                         }
                         checkedChessItemIndex = i
-                        chessMap[i]!!.border = BorderFactory.createLineBorder(Color.RED, 5)
+                        i.changeBorder(ChessItem.BORDER_TYPE_CHECK)
                         return@addActionListener
                     }
 
                     // 连输点击两个相同棋子时调用
                     if (chessMap[i]!! == chessMap[checkedChessItemIndex!!]) {
                         checkedChessItemIndex = null
-                        chessMap[i]!!.border = BorderFactory.createLineBorder(Color(0f, 0f, 0f, 0f), 5)
+                        i.changeBorder(ChessItem.BORDER_TYPE_NONE)
                         return@addActionListener
                     }
 
@@ -160,7 +169,7 @@ class ChessRunner(
                                 return@addActionListener
                             }
                             if (!ele.shown) {
-                                tv.text = "被吃掉的棋子是：${
+                                tv.text = "${
                                     when (ele.chessColor) {
                                         0 -> "空白"
                                         1 -> {
@@ -189,7 +198,7 @@ class ChessRunner(
                                         }
                                         else -> "军师"
                                     }
-                                }"
+                                }被炮吃掉了。"
                             }
                             eat(chessMap[checkedChessItemIndex!!]!!, ele)
                         } else if (i % 8 == checkedChessItemIndex!! % 8) {
@@ -224,7 +233,7 @@ class ChessRunner(
                                 return@addActionListener
                             }
                             if (!ele.shown) {
-                                tv.text = "被吃掉的棋子是：${
+                                tv.text = "${
                                     when (ele.chessColor) {
                                         0 -> "空白"
                                         1 -> {
@@ -253,7 +262,7 @@ class ChessRunner(
                                         }
                                         else -> "军师"
                                     }
-                                }"
+                                }被炮吃掉了。"
                             }
                             eat(chessMap[checkedChessItemIndex!!]!!, ele)
                         }
@@ -296,8 +305,7 @@ class ChessRunner(
 
                         // 点击一个不能吃到的棋子时调用
                     } else {
-                        chessMap[checkedChessItemIndex!!]!!.border =
-                            BorderFactory.createLineBorder(Color(0f, 0f, 0f, 0f), 5)
+                        checkedChessItemIndex!!.changeBorder(ChessItem.BORDER_TYPE_NONE)
                         checkedChessItemIndex = null
                         return@addActionListener
                     }
@@ -305,8 +313,12 @@ class ChessRunner(
                     loge(t)
                 }
             }
-            ele.addActionListener(action)
+            ele.addActionListener {
+                action.invoke(it)
+                checkWin(chessMap)
+            }
         }
+        refresh()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -317,13 +329,9 @@ class ChessRunner(
             turn = chessMapUndoTree[chessMapUndoTree.lastIndex]["turn"]!! as Int
             chessMapUndoTree.removeAt(chessMapUndoTree.lastIndex)
         } catch (e: IndexOutOfBoundsException) {
-            loge(e, "您是否没有走棋？程序遇到了错误，可能出现问题。")
-//            chessMap = chessMapBackup.clone()
+            loge(e, "您是否没有走棋？")
             return
         }
-//        chessMap.forEachIndexed { index, _ ->
-//            chessMap[index] = null
-//        }
         doInit()
         refresh()
     }
@@ -344,21 +352,59 @@ class ChessRunner(
     private fun eat(eater: ChessItem, eaten: ChessItem) {
         addToBackTree()
         changeTurn()
+        // 清除蓝色边框
+        chessMap.forEachIndexed { i, j ->
+            when (j!!.border) {
+                blueBorder -> {
+                    i.changeBorder(ChessItem.BORDER_TYPE_NONE)
+                }
+            }
+        }
         eaten.chessType = eater.chessType
         eaten.chessColor = eater.chessColor
         eaten.shown = eater.shown
         eater.chessColor = 0
         eater.chessType = Int.MAX_VALUE
-        eater.border = BorderFactory.createLineBorder(Color(0f, 0f, 0f, 0f), 5)
+        eater.border = blueBorder
+        eaten.border = blueBorder
         checkedChessItemIndex = null
     }
 
-    private fun win(chessMap: Array<ChessItem?>, frame: JFrame) {
-        isRedWin(chessMap, frame)
-        isBlackWin(chessMap, frame)
+    /**
+     * 更改边框
+     */
+    private fun changeBorder(itemIndex: Int, type: Int) {
+        if (itemIndex > 32 - 1 || itemIndex < 1 - 1) {
+            return
+        }
+        when (type) {
+            ChessItem.BORDER_TYPE_EAT -> {
+                // 清除蓝色边框
+                chessMap.forEachIndexed { i, j ->
+                    when (j!!.border) {
+                        blueBorder -> {
+                            i.changeBorder(ChessItem.BORDER_TYPE_NONE)
+                        }
+                    }
+                }
+                chessMap[itemIndex]!!.border = blueBorder
+            }
+            ChessItem.BORDER_TYPE_CHECK -> chessMap[itemIndex]!!.border = redBorder
+            ChessItem.BORDER_TYPE_NONE -> chessMap[itemIndex]!!.border = noBorder
+        }
     }
 
-    private fun isRedWin(chessMap: Array<ChessItem?>, frame: JFrame) {
+    @JvmName("changeBorder1")
+    private fun Int.changeBorder(type: Int) {
+        changeBorder(this, type)
+    }
+
+    private fun checkWin(chessMap: Array<ChessItem?>) {
+        isRedWin(chessMap)
+        isBlackWin(chessMap)
+    }
+
+    private fun isRedWin(chessMap: Array<ChessItem?>) {
         for (j in chessMap) {
             if (j!!.chessColor == 0) {
                 continue
@@ -379,7 +425,7 @@ class ChessRunner(
         )
     }
 
-    private fun isBlackWin(chessMap: Array<ChessItem?>, frame: JFrame) {
+    private fun isBlackWin(chessMap: Array<ChessItem?>) {
         for (j in chessMap) {
             if (j!!.chessColor == 0) {
                 continue
@@ -456,6 +502,7 @@ class ChessRunner(
         }
     }
 
+    @Suppress("UNUSED")
     fun save(file: File) {
         try {
             if (!file.exists()) {

@@ -3,7 +3,6 @@ package goldenhuaji.me.fanchess.ui
 import java.awt.*
 import java.util.ArrayList
 import javax.swing.*
-import javax.swing.border.Border
 
 /**
  * MyVFlowLayout is similar to FlowLayout except it lays out components
@@ -23,7 +22,7 @@ class MyVFlowLayout @JvmOverloads constructor(
     topVerticalGap: Int = 5,
     bottomVerticalGap: Int = 5,
     isHorizontalFill: Boolean = true,
-    isVerticalFill: Boolean = false
+    isVerticalFill: Boolean = false,
 ) :
     FlowLayout() {
     private var horizontalAlignment = 0
@@ -89,7 +88,7 @@ class MyVFlowLayout @JvmOverloads constructor(
     ) {
     }
 
-//    constructor(align: Int) : this(align, MIDDLE, 5, 5, 5, 5, true, false) {}
+    //    constructor(align: Int) : this(align, MIDDLE, 5, 5, 5, 5, true, false) {}
     constructor(align: Int, isHorizontalFill: Boolean, isVerticalFill: Boolean) : this(
         align,
         MIDDLE,
@@ -107,7 +106,7 @@ class MyVFlowLayout @JvmOverloads constructor(
         horizontalGap: Int,
         verticalGap: Int,
         isHorizontalFill: Boolean,
-        isVerticalFill: Boolean
+        isVerticalFill: Boolean,
     ) : this(align, MIDDLE, horizontalGap, verticalGap, verticalGap, verticalGap, isHorizontalFill, isVerticalFill) {
     }
 
@@ -118,7 +117,7 @@ class MyVFlowLayout @JvmOverloads constructor(
         topVerticalGap: Int,
         bottomVerticalGap: Int,
         isHorizontalFill: Boolean,
-        isVerticalFill: Boolean
+        isVerticalFill: Boolean,
     ) : this(
         align,
         MIDDLE,
@@ -169,7 +168,7 @@ class MyVFlowLayout @JvmOverloads constructor(
         val insets = container.insets
         rs.width += insets.left + insets.right
         rs.height += insets.top + insets.bottom
-        if (0 < components.size) {
+        if (components.isNotEmpty()) {
             rs.width += hgap * 2
             rs.height += topVerticalGap
             rs.height += bottomVerticalGap
@@ -309,36 +308,5 @@ class MyVFlowLayout @JvmOverloads constructor(
          * Specify the alignment to be right.
          */
         const val RIGHT = 2
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            println("Just for test ...")
-            val frame = JFrame()
-            frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-            frame.setBounds(0, 0, 300, 500)
-            val contentPanel = JPanel()
-            val padding = BorderFactory.createEmptyBorder(5, 5, 5, 5)
-            contentPanel.border = padding
-            contentPanel.background = Color.LIGHT_GRAY
-            val myVFlowLayout = MyVFlowLayout(1, 0, 5, 5, 20, 40, true, false)
-            contentPanel.layout = myVFlowLayout
-            val scrollPane = JScrollPane(contentPanel)
-            frame.add(scrollPane)
-            for (i in 0..6) {
-                val button = JButton((i + 1).toString())
-                button.preferredSize = Dimension(50, 30)
-                contentPanel.add(button)
-            }
-            val specButton = JButton("spec")
-            specButton.preferredSize = Dimension(100, 50)
-            contentPanel.add(specButton)
-            specButton.isVisible = true
-            for (i in 0..19) {
-                val button = JButton((i + 1).toString())
-                button.preferredSize = Dimension(90, 30)
-                contentPanel.add(button)
-            }
-            frame.isVisible = true
-        }
     }
 }

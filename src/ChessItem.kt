@@ -107,5 +107,9 @@ class ChessItem : JButton() {
         const val CHESS_COLOR_DEAD = 0
         const val CHESS_COLOR_RED = 1 // 红方
         const val CHESS_COLOR_BLACK = 2 // 黑方
+
+        const val BORDER_TYPE_EAT = 0
+        const val BORDER_TYPE_CHECK = 1
+        const val BORDER_TYPE_NONE = 2
     }
 }

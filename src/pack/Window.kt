@@ -58,9 +58,15 @@ class Window : JFrame() {
                             return@addActionListener
                         }
                     }
-                    val oldFile = File("src\\pack\\examplePack.zip")
-                    oldFile.copyTo(file, true)
+                    val fileOutputStream = FileOutputStream(file)
+                    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+                    fileOutputStream.write(FileInputStream(File(ResLoader.loadRes("examplePack.zip")!!
+                        .toURI())).readAllBytes())
+                    fileOutputStream.flush()
+                    fileOutputStream.close()
                     JOptionPane.showMessageDialog(null, "成功")
+                } catch (t: KotlinNullPointerException) {
+                    GLog.loge(t, "错误：找不到原文件")
                 } catch (t: Throwable) {
                     GLog.loge(t)
                 }
@@ -96,7 +102,6 @@ class Window : JFrame() {
                 """.trimMargin())
             }
         })
-//        panel.add(JLabel("<html>当前资源包：${if (ConfigManager.get().getString(ConfigManager.ENABLED_PACK_PATH) == null) "默认" else ConfigManager.get().getString(ConfigManager.ENABLED_PACK_PATH)}</html>"))
         panel.add(JLabel("<html>把资源包放置在 ${System.getenv("APPDATA")}\\FanChess\\pack 来识别</html>"))
         this.add(panel)
         this.isVisible = true
