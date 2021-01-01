@@ -18,6 +18,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileWriter
 import javax.swing.*
+import javax.swing.UIManager.LookAndFeelInfo
 import kotlin.system.exitProcess
 
 
@@ -33,10 +34,20 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
         frmIpa!!.setBounds(600, 300, 1250, 600)
         frmIpa!!.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         frmIpa!!.iconImage = ImageIcon(javaClass.classLoader.getResource("军师.png")).image
+        // 设定外观
+        for (info in UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus" == info.name) {
+                UIManager.setLookAndFeel(info.className)
+                break
+            }
+        }
+        JFrame.setDefaultLookAndFeelDecorated(true)
+        JDialog.setDefaultLookAndFeelDecorated(true)
         // 面板1
         val panel = JPanel()
         frmIpa!!.contentPane.add(panel, BorderLayout.WEST)
         val btnNewWar = JButton("开始新的对战")
+        btnNewWar.isFocusPainted = false
         btnNewWar.addActionListener {
             val tmp = JOptionPane.showOptionDialog(
                 btnNewWar,
@@ -73,6 +84,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
 
         val chessPan = ChessRunner(frmIpa!!, chessMap, tv2, tv)
         val btnShowAllChessItem = JButton("翻开所有棋子")
+        btnShowAllChessItem.isFocusPainted = false
         btnShowAllChessItem.addActionListener {
             try {
                 chessPan.addToBackTree()
@@ -95,6 +107,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
         }
         jPanel.add(chessPan)
         val btnUndo = JButton("悔棋")
+        btnUndo.isFocusPainted = false
         btnUndo.addActionListener {
             try {
                 chessPan.undo()
@@ -104,6 +117,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
         }
         jPanel.add(chessPan)
         val btnSave = JButton("保存对战")
+        btnSave.isFocusPainted = false
         btnSave.addActionListener {
             try {
                 chessPan.save(frmIpa!!)
@@ -112,6 +126,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
             }
         }
         val btnLoad = JButton("加载对战")
+        btnLoad.isFocusPainted = false
         btnLoad.addActionListener {
             try {
                 val jfc = JFileChooser()
@@ -133,6 +148,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
             }
         }
         val btnEdit = JButton("自定义布局")
+        btnEdit.isFocusPainted = false
         btnEdit.addActionListener {
             try {
                 Window()
@@ -141,6 +157,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
             }
         }
         val btnSettings = JButton("设置")
+        btnSettings.isFocusPainted = false
         btnSettings.addActionListener {
             try {
                 goldenhuaji.me.fanchess.settings.Window()
@@ -149,6 +166,7 @@ class Window(chessMap: Array<ChessItem?>, turn: Int? = null) {
             }
         }
         val btnRefresh = JButton("刷新")
+        btnRefresh.isFocusPainted = false
         btnRefresh.addActionListener {
             try {
                 chessPan.refresh()

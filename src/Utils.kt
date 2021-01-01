@@ -1,6 +1,8 @@
 package goldenhuaji.me.fanchess
 
 import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.JSONException
+import com.alibaba.fastjson.JSONObject
 import com.alibaba.fastjson.util.TypeUtils.castToJavaBean
 import goldenhuaji.me.fanchess.GLog.loge
 import goldenhuaji.me.fanchess.settings.ConfigManager
@@ -24,9 +26,8 @@ import java.io.OutputStream
 import java.nio.charset.Charset
 
 import java.util.ArrayList
-
-
-
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 
 object Utils {
@@ -155,4 +156,49 @@ object Utils {
 
 fun File.unzip(path: String) {
     Utils.unzipFile(this, path)
+}
+
+/**
+ * 清除JSON多余空格
+ */
+fun String.removeWhitespaces(): String? {
+    var dest = ""
+    val p: Pattern = Pattern.compile("\\s*|\t|\r|\n")
+    val m: Matcher = p.matcher(this)
+    dest = m.replaceAll("")
+    return dest
+}
+
+fun File.getPackInfo(): JSONObject? {
+    try {
+        val path = System.getProperty("java.io.tmpdir") + "FanChess\\Tmp\\" + Math.random().toString().replace("0.", "")
+        File(System.getProperty("java.io.tmpdir") + "FanChess\\").mkdir()
+        File(System.getProperty("java.io.tmpdir") + "FanChess\\Tmp\\").mkdir()
+        File(path).mkdir()
+        this.unzip(path)
+        val info = File("$path\\config.json")
+        if (!info.exists()) {
+            File(path).deleteRecursively()
+            return null
+        }
+        val str = info.readText().removeWhitespaces()
+        val json: JSONObject
+        try {
+            json = JSON.parseObject(str)
+        } catch (ignore: JSONException) {
+            File(path).deleteRecursively()
+            return null
+        }
+        val json2return = JSONObject()
+        json2return["desc"] = json["desc"]
+        json2return["author"] = json["author"]
+        json2return["copyright"] = json["copyright"]
+        return json2return
+    } catch (t: Throwable) {
+        File(path).deleteRecursively()
+        loge(t)
+        return null
+    } finally {
+        File(path).deleteRecursively()
+    }
 }

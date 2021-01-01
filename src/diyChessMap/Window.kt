@@ -25,8 +25,9 @@ class Window {
         val chessPan = ChessRunner(Array(32) {
             ChessItem()
         })
-        val leftPanel = JPanel(MyVFlowLayout()).apply {
+        val leftPanel = JPanel().apply {
             add(JButton("保存").also {
+                it.isFocusPainted = false
                 it.addActionListener {
                     if (fileToSaveAt == null) {
                         val file = chessPan.save(frmIpa!!) ?: return@addActionListener
@@ -37,6 +38,7 @@ class Window {
                 }
             })
             add(JButton("另存为").also {
+                it.isFocusPainted = false
                 it.addActionListener {
                     val file = chessPan.save(frmIpa!!) ?: return@addActionListener
                     fileToSaveAt = file
@@ -50,6 +52,7 @@ class Window {
             }
 
             add(JButton("从文件加载").also {
+                it.isFocusPainted = false
                 it.addActionListener {
                     try {
                         val jfc = JFileChooser()
@@ -76,6 +79,7 @@ class Window {
             add(btnChangeTurn)
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
         }
+        leftPanel.layout = MyVFlowLayout()
         frmIpa!!.add(leftPanel, BorderLayout.WEST)
         // 面板1
         val panel = JPanel()

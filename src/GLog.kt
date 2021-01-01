@@ -26,6 +26,9 @@ object GLog {
             JPanel(BorderLayout()).also {
                 it.add(JLabel("错误：程序运行时捕捉到错误如下。"), BorderLayout.NORTH)
                 it.add(JScrollPane(TextArea("${getStackTraceString(t)}")), BorderLayout.SOUTH)
+                if (msg.isNotEmpty()) {
+                    it.add(JLabel("<html>$msg</html>"))
+                }
             },
             "错误",
             JOptionPane.OK_OPTION,
@@ -34,21 +37,9 @@ object GLog {
             arrayOf("确定"),
             "确定"
         )
-        if (msg.isNotEmpty()) {
-            JOptionPane.showOptionDialog(
-                null,
-                msg,
-                "错误",
-                JOptionPane.OK_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                null,
-                arrayOf("确定"),
-                "确定"
-            )
-        }
     }
 
-    fun getStackTraceString(tr: Throwable?): String? {
+    fun getStackTraceString(tr: Throwable?): String {
         if (tr == null) {
             return ""
         }
