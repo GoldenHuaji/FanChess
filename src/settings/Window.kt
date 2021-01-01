@@ -15,9 +15,10 @@ class Window : JFrame() {
         "1.0 Beta" to "+ 修复 悔棋\n+ 修复 炮能吃己方棋子\n+ 增加 存盘和复盘系统\n+ 增加 设置\n+ 增加 自动保存\n+ 增加 自定义棋局\n+ 改变 军师模式",
         "1.0 Alpha" to "+ 修复 炮能够跨过两个棋子到达空白处\n+ 添加 资源包",
         "1.0 Omega" to "+ 修复 4个有关悔棋的BUG\n+ 添加 刷新按钮\n+ 美化 排版",
-        "1.1 Beta" to "+ 优化 界面\n+ 优化 资源包"
+        "1.1 Beta" to "+ 优化 界面\n+ 优化 资源包",
+        "1.1.1 Beta" to "+ 优化 界面\n+ 优化 资源包\n+ 修复 无法导出示例资源包的BUG\n+ 添加 走棋轨迹"
     )
-    private val versionArray = arrayOf("1.1 Beta", "1.0 Omega", "1.0 Alpha", "1.0 Beta")
+    private val versionArray = arrayOf("1.1.1 Beta", "1.1 Beta", "1.0 Omega", "1.0 Alpha", "1.0 Beta")
 
     init {
         title = "翻翻棋 - 设置"
